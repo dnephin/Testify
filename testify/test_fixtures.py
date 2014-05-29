@@ -82,7 +82,7 @@ class TestFixtures(object):
         wrapper._fixture_id = fixture._fixture_id
         wrapper._defining_class_depth = fixture._defining_class_depth
 
-        return types.MethodType(wrapper, fixture.im_self)
+        return types.MethodType(wrapper, fixture.__self__)
 
     @contextlib.contextmanager
     def class_context(self, setup_callbacks=None, teardown_callbacks=None):
@@ -286,7 +286,7 @@ class TestFixtures(object):
 
                 # we grabbed this from the class and need to bind it to the
                 # test case
-                instance_method = instancemethod(unbound_method, test_case, test_case.__class__)
+                instance_method = types.MethodType(unbound_method, test_case)
                 all_fixtures[instance_method._fixture_type].append(instance_method)
 
         class_level = ['class_setup', 'class_teardown', 'class_setup_teardown']

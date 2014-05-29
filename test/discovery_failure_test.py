@@ -36,7 +36,7 @@ class BrokenImportTestCase(TestCase):
         for f in files:
             try:
                 os.remove(f)
-            except OSError, exc:
+            except OSError as exc:
                 _log.error("Could not remove broken import file %s: %r" % (f, exc))
 
     @class_setup
@@ -55,7 +55,7 @@ class DiscoveryFailureTestCase(BrokenImportTestCase):
         try:
             discovered_tests = test_discovery.discover(self.broken_import_module)
             discovered_tests.next()
-        except DiscoveryError, exc:
+        except DiscoveryError as exc:
             assert_in('No module named non_existent_module', str(exc))
         else:
             assert False, 'Expected DiscoveryError.'
@@ -72,7 +72,7 @@ class DiscoveryFailureUnknownErrorTestCase(BrokenImportTestCase):
         try:
             discovered_tests = test_discovery.discover(self.broken_import_module)
             discovered_tests.next()
-        except DiscoveryError, exc:
+        except DiscoveryError as exc:
             assert_in('Got unknown error when trying to import', str(exc))
         else:
             assert False, 'Expected DiscoveryError.'

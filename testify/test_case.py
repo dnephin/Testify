@@ -144,7 +144,7 @@ class TestCase(object):
         for name in dir(deprecated_assertions):
             if name.startswith(('assert', 'fail')):
                 func = getattr(deprecated_assertions, name)
-                setattr(self, name, itypes.MethodType(func, self))
+                setattr(self, name, types.MethodType(func, self))
 
         self.failure_limit = kwargs.pop('failure_limit', None)
         self.failure_count = 0

@@ -2,7 +2,6 @@
 Client-server setup for evenly distributing tests across multiple processes.
 See the test_runner_server module.
 """
-import urllib2
 try:
     import simplejson as json
     _hush_pyflakes = [json]
@@ -12,8 +11,10 @@ except ImportError:
 import time
 import logging
 
-import test_discovery
-from test_runner import TestRunner
+from six.moves import urllib
+
+import testify.test_discovery
+from testify.test_runner import TestRunner
 
 
 class TestRunnerClient(TestRunner):
@@ -49,13 +50,13 @@ class TestRunnerClient(TestRunner):
                 url = 'http://%s/tests?runner=%s&revision=%s' % (self.connect_addr, self.runner_id, self.revision)
             else:
                 url = 'http://%s/tests?runner=%s' % (self.connect_addr, self.runner_id)
-            response = urllib2.urlopen(url)
+            response = urllib.request.urlopen(url)
             d = json.load(response)
             return (d.get('class'), d.get('methods'), d['finished'])
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             logging.warning("Got HTTP status %d when requesting tests -- bailing" % (e.code))
             return None, None, True
-        except urllib2.URLError, e:
+        except urllib.error.URLError as e:
             if retry_limit > 0:
                 logging.warning("Got error %r when requesting tests, retrying %d more times." % (e, retry_limit))
                 time.sleep(retry_interval)
