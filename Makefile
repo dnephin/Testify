@@ -1,4 +1,4 @@
-PYTHON=`which python`
+PYTHON=python3
 DESTDIR=/
 PROJECT=python-testify
 BUILDIR=$(CURDIR)/debian/$PROJECT

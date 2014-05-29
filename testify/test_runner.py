@@ -24,8 +24,8 @@ import functools
 import pprint
 import sys
 
-from test_case import MetaTestCase, TestCase
-import test_discovery
+from testify.test_case import MetaTestCase, TestCase
+from testify import test_discovery
 
 
 class TestRunner(object):
@@ -137,7 +137,7 @@ class TestRunner(object):
                 discovered_tests = discover_tests_by_buckets()
             else:
                 discovered_tests = discover_tests()
-        except test_discovery.DiscoveryError, exc:
+        except test_discovery.DiscoveryError as exc:
             for reporter in self.test_reporters:
                 reporter.test_discovery_failure(exc)
             sys.exit(1)

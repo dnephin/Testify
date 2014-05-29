@@ -23,7 +23,6 @@ __author__ = "Oliver Nicholas <bigo@yelp.com>"
 __testify = 1
 
 from collections import defaultdict
-from new import instancemethod
 import functools
 import inspect
 import sys
@@ -34,8 +33,8 @@ from testify.utils import class_logger
 from testify.test_fixtures import DEPRECATED_FIXTURE_TYPE_MAP
 from testify.test_fixtures import TestFixtures
 from testify.test_fixtures import suite
-from test_result import TestResult
-import deprecated_assertions
+from testify.test_result import TestResult
+from testify import deprecated_assertions
 
 
 class MetaTestCase(type):
@@ -144,7 +143,8 @@ class TestCase(object):
         # for now, we still support the use of unittest-style assertions defined on the TestCase instance
         for name in dir(deprecated_assertions):
             if name.startswith(('assert', 'fail')):
-                setattr(self, name, instancemethod(getattr(deprecated_assertions, name), self, self.__class__))
+                func = getattr(deprecated_assertions, name)
+                setattr(self, name, itypes.MethodType(func, self))
 
         self.failure_limit = kwargs.pop('failure_limit', None)
         self.failure_count = 0
@@ -156,7 +156,7 @@ class TestCase(object):
     def _generate_test_method(self, method_name, function):
         """Allow tests to define new test methods in their __init__'s and have appropriate suites applied."""
         suite(*getattr(self, '_suites', set()))(function)
-        setattr(self, method_name, instancemethod(function, self, self.__class__))
+        setattr(self, method_name, types.MethodType(function, self))
 
     def runnable_test_methods(self):
         """Generator method to yield runnable test methods.

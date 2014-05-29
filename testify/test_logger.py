@@ -22,6 +22,9 @@ import operator
 import subprocess
 import sys
 
+import six
+from six.moves import reduce
+
 from testify import test_reporter
 
 VERBOSITY_SILENT    = 0  # Don't say anything, just exit with a status code
@@ -121,18 +124,18 @@ class TextTestLogger(TestLoggerBase):
                 output = subprocess.Popen(["tput", "colors"], stdout=subprocess.PIPE).communicate()[0]
                 if int(output.strip()) >= 8:
                     self.use_color = True
-            except Exception, e:
+            except Exception as e:
                 if self.options.verbosity >= VERBOSITY_VERBOSE:
                     self.writeln("Failed to find color support: %r" % e)
 
     def write(self, message):
         """Write a message to the output stream, no trailing newline"""
-        self.stream.write(message.encode('utf8') if isinstance(message, unicode) else message)
+        self.stream.write(message)
         self.stream.flush()
 
     def writeln(self, message):
         """Write a message and append a newline"""
-        self.stream.write("%s\n" % (message.encode('utf8') if isinstance(message, unicode) else message))
+        self.stream.write("%s\n" % (message.encode('utf8') if isinstance(message, six.text_type) else message))
         self.stream.flush()
 
     BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(30, 38)
@@ -141,8 +144,8 @@ class TextTestLogger(TestLoggerBase):
         if not color or not self.use_color:
             return message
         else:
-            start_color = chr(0033) + '[1;%sm' % color
-            end_color = chr(0033) + '[m'
+            start_color = chr(0o33) + '[1;%sm' % color
+            end_color = chr(0o33) + '[m'
             return start_color + message + end_color
 
     def test_discovery_failure(self, exc):

@@ -130,7 +130,7 @@ def collect(syscall, path, resolved_path):
             'syscall_args': resolved_path,
             'start_time': time.time()
         })
-    except Exception, e:
+    except Exception as e:
         # No way to recover in here, just report error and violation
         sys.stderr.write('Error collecting violation data. Error %r. Violation: %r\n' % (e, (syscall, resolved_path)))
 
@@ -276,7 +276,7 @@ class ViolationStore(object):
             testinfo.update(self.info)
             result = self.conn.execute(self.Methods.insert(), testinfo)
             self._set_last_test_id(result.lastrowid)
-        except Exception, e:
+        except Exception as e:
             logging.error('Exception inserting testinfo: %r' % e)
 
     def add_violation(self, violation):
@@ -292,7 +292,7 @@ class ViolationStore(object):
             test_id = self.get_last_test_id()
             violation.update({'test_id': test_id})
             self.conn.execute(self.Violations.insert(), violation)
-        except Exception, e:
+        except Exception as e:
             logging.error('Exception inserting violations: %r' % e)
 
     def violation_counts(self):
@@ -417,19 +417,19 @@ def prepare_test_program(options, program):
     if options.catbox_violations:
         if not sys.platform.startswith('linux'):
             msg = 'Violation collection plugin is Linux-specific. Please either run your tests on Linux or disable the plugin.'
-            raise Exception, msg
+            raise Exception(msg)
         msg_pcre = '\nhttps://github.com/Yelp/catbox/wiki/Install-Catbox-with-PCRE-enabled\n'
         if not catbox:
             msg = 'Violation collection requires catbox and you do not have it installed in your PYTHONPATH.\n'
             msg += msg_pcre
-            raise ImportError, msg
+            raise ImportError(msg)
         if catbox and not catbox.has_pcre():
             msg = 'Violation collection requires catbox compiled with PCRE. Your catbox installation does not have PCRE support.'
             msg += msg_pcre
-            raise ImportError, msg
+            raise ImportError(msg)
         if not SA:
             msg = 'Violation collection requires sqlalchemy and you do not have it installed in your PYTHONPATH.\n'
-            raise ImportError, msg
+            raise ImportError(msg)
 
         ctx.output_stream = sys.stderr # TODO: Use logger?
         ctx.output_verbosity = options.verbosity

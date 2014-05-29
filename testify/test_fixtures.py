@@ -2,7 +2,7 @@ __testify =1
 import contextlib
 import inspect
 import sys
-from new import instancemethod
+import types
 
 from testify.utils import inspection
 from testify.test_result import TestResult
@@ -82,7 +82,7 @@ class TestFixtures(object):
         wrapper._fixture_id = fixture._fixture_id
         wrapper._defining_class_depth = fixture._defining_class_depth
 
-        return instancemethod(wrapper, fixture.im_self, fixture.im_class)
+        return types.MethodType(wrapper, fixture.im_self)
 
     @contextlib.contextmanager
     def class_context(self, setup_callbacks=None, teardown_callbacks=None):

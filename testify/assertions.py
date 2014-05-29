@@ -202,7 +202,7 @@ def assert_raises_and_contains(expected_exception_class, strings, callable_obj, 
     """
     try:
         callable_obj(*args, **kwargs)
-    except expected_exception_class, e:
+    except expected_exception_class as e:
         message = str(e).lower()
         if isinstance(strings, basestring):
             strings = [strings]

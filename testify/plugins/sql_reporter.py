@@ -25,13 +25,12 @@ except ImportError:
 import yaml
 import time
 import threading
-import Queue
 
-SA = None
+import six
 try:
     import sqlalchemy as SA
 except ImportError:
-    pass
+    SA = None
 
 from testify import test_reporter
 
@@ -67,7 +66,7 @@ class SQLReporter(test_reporter.TestReporter):
                 for row in self.conn.execute(self.Tests.select())
             )
 
-        self.result_queue = Queue.Queue()
+        self.result_queue = six.queue.Queue()
         self.ok = True
 
         self.reporting_frequency = options.sql_reporting_frequency
@@ -260,7 +259,7 @@ class SQLReporter(test_reporter.TestReporter):
             conn.execute(self.TestResults.insert(),
                 [self._create_row_to_insert(conn, result, result.get('previous_run_id', None)) for result in chunk]
             )
-        except Exception, e:
+        except Exception as e:
             logging.exception("Exception while reporting results: " + repr(e))
             self.ok = False
         finally:
@@ -282,14 +281,14 @@ class SQLReporter(test_reporter.TestReporter):
             try:
                 while True:
                     results.append(self.result_queue.get_nowait())
-            except Queue.Empty:
+            except six.queue.Empty:
                 pass
 
             # Insert any previous runs, if necessary.
             for result in filter(lambda x: x['previous_run'], results):
                 try:
                     result['previous_run_id'] = self._insert_single_run(conn, result['previous_run'])
-                except Exception, e:
+                except Exception as e:
                     logging.exception("Exception while reporting results: " + repr(e))
                     self.ok = False
 
@@ -325,7 +324,7 @@ def build_test_reporters(options):
     if options.reporting_db_config or options.reporting_db_url:
         if not SA:
             msg = 'SQL Reporter plugin requires sqlalchemy and you do not have it installed in your PYTHONPATH.\n'
-            raise ImportError, msg
+            raise ImportError(msg)
         return [SQLReporter(options)]
     return []
 

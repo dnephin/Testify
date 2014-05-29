@@ -30,7 +30,7 @@ try:
     import coverage
     _hush_pyflakes = [coverage]
     del _hush_pyflakes
-except (ImportError, NameError), ex:
+except (ImportError, NameError):
     coverage = None
 
 started = False
@@ -58,11 +58,11 @@ def stop():
 
 if __name__ == "__main__":
     if coverage is None:
-        print """You must install the Python coverage 3.0.b3 package to use coverage.\nhttp://pypi.python.org/pypi/coverage/"""
+        print ("""You must install the Python coverage 3.0.b3 package to use coverage.\nhttp://pypi.python.org/pypi/coverage/""")
         quit()
 
     if len(sys.argv) < 2:
-        print "Usage: python code_coverage.py output_directory <diff>"
+        print ("Usage: python code_coverage.py output_directory <diff>")
         quit()
 
     if len(sys.argv) > 2:
@@ -79,7 +79,4 @@ if __name__ == "__main__":
         coverage_instance.html_report(morfs=None, directory=directory, ignore_errors=False, omit_prefixes=None)
     else:
         coverage_instance.svnhtml_report(morfs=None, directory=directory, ignore_errors=False, omit_prefixes=None, filename=diff_file)
-
-    #coverage_result = coverage_entry_point()
-    #sys.exit(coverage_result)
 

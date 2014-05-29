@@ -22,6 +22,8 @@ import sys
 import logging
 import imp
 
+import six
+
 import testify
 from testify import test_logger
 from testify.test_runner import TestRunner
@@ -77,7 +79,7 @@ def load_plugins():
         for file_name in os.listdir(plugin_path):
 
             # For any file that we know how to load, try to import it
-            if any(file_name.endswith('.py') and not file_name.startswith('.') for suffix in suffix_map.iterkeys()):
+            if any(file_name.endswith('.py') and not file_name.startswith('.') for suffix in six.iterkeys(suffix_map)):
                 full_file_path = os.path.join(plugin_path, file_name)
                 mod_name, suffix = os.path.splitext(file_name)
 
@@ -86,9 +88,9 @@ def load_plugins():
                         plugin_modules.append(imp.load_module(mod_name, file, full_file_path, suffix_map.get(suffix)))
                     except TypeError:
                         continue
-                    except ImportError, e:
+                    except ImportError as e:
                         print >>sys.stderr, "Failed to import plugin %s: %r" % (full_file_path, e)
-                    except Exception, e:
+                    except Exception as e:
                         raise Exception('whaa?: %r' % e)
     return plugin_modules
 
